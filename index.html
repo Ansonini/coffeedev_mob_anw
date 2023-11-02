@@ -20,51 +20,57 @@
 
   <base target="_blank">
 
-  <title>Peer connection</title>
+  <title>MediaStream Recording</title>
 
   <link rel="icon" sizes="192x192" href="../../../images/webrtc-icon-192x192.png">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="../../../css/main.css"/>
-  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="../../../css/main.css">
+  <link rel="stylesheet" href="css/main.css">
 
 </head>
 
 <body>
 
 <div id="container">
+
   <h1><a href="//webrtc.github.io/samples/" title="WebRTC samples homepage">WebRTC samples</a>
-    <span>Peer connection</span></h1>
+    <span>MediaRecorder</span></h1>
 
-  <p>This sample shows how to setup a connection between two peers using
-    <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection">RTCPeerConnection</a>.
-  </p>
+  <p>For more information see the MediaStream Recording API <a
+          href="http://w3c.github.io/mediacapture-record/MediaRecorder.html"
+          title="W3C MediaStream Recording API Editor's Draft">Editor's&nbsp;Draft</a>.</p>
 
-  <video id="localVideo" playsinline autoplay muted></video>
-  <video id="remoteVideo" playsinline autoplay></video>
+  <video id="gum" playsinline autoplay muted></video>
+  <video id="recorded" playsinline loop></video>
 
-  <div class="box">
-    <button id="startButton">Start</button>
-    <button id="callButton">Call</button>
-    <button id="hangupButton">Hang Up</button>
+  <div>
+    <button id="start">Start camera</button>
+    <button id="record" disabled>Start Recording</button>
+    <button id="play" disabled>Play</button>
+    <button id="download" disabled>Download</button>
   </div>
 
-  <p>View the console to see logging. The <code>MediaStream</code> object <code>localStream</code>, and the <code>RTCPeerConnection</code>
-    objects <code>pc1</code> and <code>pc2</code> are in global scope, so you can inspect them in the console as
-    well.</p>
+  <div>
+    Recording format: <select id="codecPreferences" disabled></select>
+  </div>
+  <div>
+    <h4>Media Stream Constraints options</h4>
+    <p>Echo cancellation: <input type="checkbox" id="echoCancellation"></p>
+  </div>
 
-  <p>For more information about RTCPeerConnection, see <a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/"
-                                                          title="HTML5 Rocks article about WebRTC by Sam Dutton">Getting
-    Started With WebRTC</a>.</p>
+  <div>
+    <span id="errorMsg"></span>
+  </div>
 
-
-  <a href="https://github.com/webrtc/samples/tree/gh-pages/src/content/peerconnection/pc1"
+  <a href="https://github.com/webrtc/samples/tree/gh-pages/src/content/getusermedia/record"
      title="View source for this page on GitHub" id="viewSource">View source on GitHub</a>
 
 </div>
 
+<!-- include adapter for srcObject shim -->
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="js/main.js" async></script>
-
 <script src="../../../js/lib/ga.js"></script>
+
 </body>
 </html>
