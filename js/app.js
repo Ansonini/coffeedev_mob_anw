@@ -179,3 +179,61 @@ function download() {
     (window.URL || window.webkitURL).revokeObjectURL(url);
   }, 100);
 }
+
+async function cacheVideo() {
+  console.log('Caching data');
+  theRecorder.stop();
+  theStream.getTracks().forEach(track => track.stop());
+
+  // Create a new blob from the recorded chunks.
+  var blob = new Blob(recordedChunks, {type: "video/webm"});
+  var cacheName = 'video-cache';
+  var url = 'cached-video.webm'; // This URL is a key for the cache entry.
+
+  try {
+    // Check if service workers and Cache API are supported.
+    if ('serviceWorker' in navigator && 'caches' in window) {
+      let cache = await caches.open(cacheName);
+      // Here, we create a new Request object manually. The blob needs to be
+      // put into the cache via a Response object, which in turn is created from a Blob.
+      let response = new Response(blob);
+      // Put the generated Response into the cache.
+      await cache.put(url, response);
+      console.log('Video cached for offline use.');
+    } else {
+      console.log('Service workers or Cache API not supported');
+    }
+  } catch (e) {
+    console.error('Caching failed with error:', e);
+  }
+}
+
+async function playCachedVideo() {
+  var cacheName = 'video-cache';
+  var url = 'cached-video.webm';
+
+  try {
+    // Check if the Cache API is available.
+    if ('caches' in window) {
+      let cache = await caches.open(cacheName);
+      let response = await cache.match(url);
+
+      if (response) {
+        let blob = await response.blob();
+        let videoURL = URL.createObjectURL(blob);
+
+        // Now you can use videoURL as the source for a video element.
+        var mediaControl = document.querySelector('video');
+        mediaControl.src = videoURL;
+        mediaControl.load(); // If needed
+        mediaControl.play();
+      } else {
+        console.error('No cached video found.');
+      }
+    } else {
+      console.error('Cache API not supported');
+    }
+  } catch (e) {
+    console.error('Error fetching cached video:', e);
+  }
+}
