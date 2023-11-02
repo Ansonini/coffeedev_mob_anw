@@ -160,32 +160,11 @@ function recorderOnDataAvailable(event) {
   recordedChunks.push(event.data);
 }
 
-function download() {
-  console.log('Saving data');
-  theRecorder.stop();
-  theStream.getTracks()[0].stop();
-
-  var blob = new Blob(recordedChunks, {type: "video/webm"});
-  var url = (window.URL || window.webkitURL).createObjectURL(blob);
-  var a = document.createElement("a");
-  document.body.appendChild(a);
-  a.style = "display: none";
-  a.href = url;
-  a.download = 'test.webm';
-  a.click();
-
-  // setTimeout() here is needed for Firefox.
-  setTimeout(function () {
-    (window.URL || window.webkitURL).revokeObjectURL(url);
-  }, 100);
-}
-
-async function cacheVideo() {
-  console.log('Caching data');
+async function download() {
+  console.log('video-cache');
   theRecorder.stop();
   theStream.getTracks().forEach(track => track.stop());
 
-  // Create a new blob from the recorded chunks.
   var blob = new Blob(recordedChunks, {type: "video/webm"});
   var cacheName = 'video-cache';
   var url = 'cached-video.webm'; // This URL is a key for the cache entry.
@@ -207,7 +186,6 @@ async function cacheVideo() {
     console.error('Caching failed with error:', e);
   }
 }
-
 async function playCachedVideo() {
   var cacheName = 'video-cache';
   var url = 'cached-video.webm';
