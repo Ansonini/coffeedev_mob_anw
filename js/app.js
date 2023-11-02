@@ -8,7 +8,7 @@ let recordedBlobs;
 const codecPreferences = document.querySelector('#codecPreferences');
 
 const errorMsgElement = document.querySelector('span#errorMsg');
-const recordedVideo = document.querySelector('video#recorded');
+const recordedVideo = document.querySelector('video#recordedVideo');
 const recordButton = document.querySelector('button#record');
 recordButton.addEventListener('click', () => {
   if (recordButton.textContent === 'Start Recording') {
@@ -23,31 +23,56 @@ recordButton.addEventListener('click', () => {
 });
 
 const playButton = document.querySelector('button#play');
-playButton.addEventListener('click', () => {
-  const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0];
-  const superBuffer = new Blob(recordedBlobs, {type: mimeType});
-  recordedVideo.src = null;
-  recordedVideo.srcObject = null;
-  recordedVideo.src = window.URL.createObjectURL(superBuffer);
-  recordedVideo.controls = true;
-  recordedVideo.play();
+playButton.addEventListener('click', async () => {
+  const cacheName = 'video-cache';
+  const url = 'cached-video.webm';
+
+  if ('caches' in window) {
+    try {
+      const cache = await caches.open(cacheName);
+      const response = await cache.match(url);
+
+      if (response) {
+        const blob = await response.blob();
+        recordedVideo.src = null;
+        recordedVideo.srcObject = null;
+        recordedVideo.src = window.URL.createObjectURL(blob);
+        recordedVideo.controls = true;
+        recordedVideo.play();
+      } else {
+        console.error('No cached video found.');
+      }
+    } catch (error) {
+      console.error('Error fetching cached video:', error);
+    }
+  } else {
+    console.error('Cache API not supported');
+  }
 });
 
+
 const downloadButton = document.querySelector('button#download');
-downloadButton.addEventListener('click', () => {
-  const blob = new Blob(recordedBlobs, {type: 'video/webm'});
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = url;
-  a.download = 'test.webm';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 100);
+
+downloadButton.addEventListener('click', async () => {
+  const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+  const cacheName = 'video-cache';
+  const url = 'cached-video.webm'; // The key for the cache entry
+
+  // Check if service workers and the Cache API are supported.
+  if ('serviceWorker' in navigator && 'caches' in window) {
+    try {
+      const cache = await caches.open(cacheName);
+      const response = new Response(blob);
+      await cache.put(url, response);
+      console.log('Video has been cached for offline use.');
+    } catch (error) {
+      console.error('Caching failed with error:', error);
+    }
+  } else {
+    console.error('Service workers or Cache API not supported');
+  }
 });
+
 
 function handleDataAvailable(event) {
   console.log('handleDataAvailable', event);
